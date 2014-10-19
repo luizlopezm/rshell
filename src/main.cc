@@ -1,7 +1,9 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <string.h>
 #include <vector>
 #include <string>
@@ -12,9 +14,31 @@ using namespace std;
 bool execute( vector<char *> command)
 {
 	bool good_exc = true;
-	for(int i = 0; i < command.size(); ++i)cout << command.at(i);		
-	cout << "EXECUTING CMD...." << endl;
-
+	char *argv[command.size()+ 1];
+	for(int i = 0; i < command.size(); ++i)	
+	{
+		argv[i] = command.at(i);
+	}								
+	argv[command.size()] = '\0';
+	int  pid = fork();
+	int status;
+	if(pid < 0)
+	{
+		perror("ERROR: forking child process failed\n");
+		exit(1);
+	}
+	else if (pid == 0)
+	{
+		if (execvp(*argv, argv) < 0)
+		{
+			perror("ERROR: CMD execution failed.\n");
+			good_exc = false;
+		}
+	}
+	else
+	{
+		if(-1 == wait(0)) perror ("There was an error with wait().");
+	}
 	return good_exc;	
 }
 
@@ -52,7 +76,7 @@ int main()
 			string temp = input_list.at(i);
 			cmd_run.push_back(input_list.at(i));
 			++count;
-			if(temp.find(';') != string::npos)
+			if(temp.find(';') != string::npos && no_exit )
 			{
 				temp = temp.substr(0, temp.find(';'));
 				cmd_run.at(count-1) = const_cast<char *>(temp.c_str());
@@ -61,7 +85,10 @@ int main()
 				count = 0;
 			}
 		}
-		proper_exc = execute(cmd_run);
+		if(no_exit)proper_exc = execute(cmd_run);
+		cout << endl;
+		cout.flush();
+		cin.clear();
 	}
 	return 0;
 }
