@@ -17,7 +17,8 @@ bool execute( vector<char *> command)
 	char *argv[command.size()+ 1];
 	for(int i = 0; i < command.size(); ++i)	
 	{
-		argv[i] = command.at(i);
+		argv[i] = command.at(i);	
+	
 	}								
 	argv[command.size()] = '\0';
 	int  pid = fork();
@@ -69,26 +70,45 @@ int main()
 		
 		bool proper_exc = true;
 		vector<char *>cmd_run; 
-		int count = 0; 
 		for(int i = 0; i < input_list.size();++i)
 		{	
 			
 			string temp = input_list.at(i);
-			cmd_run.push_back(input_list.at(i));
-			++count;
-			if(temp.find(';') != string::npos && no_exit )
+			if(temp == ";")
 			{
-				temp = temp.substr(0, temp.find(';'));
-				cmd_run.at(count-1) = const_cast<char *>(temp.c_str());
 				proper_exc = execute(cmd_run);
 				cmd_run.clear();
-				count = 0;
+			}
+			else
+			{
+				
+				cmd_run.push_back(input_list.at(i));
+	
+			}
+			if(temp.find(';') != string::npos && no_exit && temp != ";" )
+			{
+				if(temp.find(';') != 0)
+				{
+					input_list.at(i) = const_cast<char *>(temp.substr(0, temp.find(';')).c_str());
+					cmd_run.pop_back();
+					cmd_run.push_back(input_list.at(i));
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+			
+				}
+				else
+				{
+					cmd_run.pop_back();
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					input_list.at(i) = const_cast<char *>(temp.substr(temp.find(';')+1).c_str());
+					cmd_run.push_back(input_list.at(i));
+		
+				}
 			}
 		}
 		if(no_exit)proper_exc = execute(cmd_run);
 		cout << endl;
-		cout.flush();
-		cin.clear();
 	}
 	return 0;
 }
