@@ -1,0 +1,123 @@
+Script started on Tue 21 Oct 2014 05:56:32 AM PDT
+]0;luiz@luiz-MacBookPro: ~/Desktop/cs100/firstrepo/rshell/testluiz@luiz-MacBookPro:~/Desktop/cs100/firstrepo/rshell/test$ cd ../src
+]0;luiz@luiz-MacBookPro: ~/Desktop/cs100/firstrepo/rshell/srcluiz@luiz-MacBookPro:~/Desktop/cs100/firstrepo/rshell/src$ ./a.out
+luiz@luiz-MacBookPro$echo hello
+hello
+
+luiz@luiz-MacBookPro$ls -a
+.  ..  a.out  main.cc  main.cc~
+
+luiz@luiz-MacBookPro$mkdir test
+
+luiz@luiz-MacBookPro$ls
+a.out  main.cc	main.cc~  test
+
+luiz@luiz-MacBookPro$ls -a; echo hello; mkdir test
+.  ..  a.out  main.cc  main.cc~  test
+hello
+mkdir: cannot create directory ‘test’: File exists
+
+luiz@luiz-MacBookPro$ls -a ; echo hello ; pwd
+.  ..  a.out  main.cc  main.cc~  test
+hello
+/home/luiz/Desktop/cs100/firstrepo/rshell/src
+
+luiz@luiz-MacBookPro$ls -a ;echo hello ;pwd
+.  ..  a.out  main.cc  main.cc~  test
+hello
+/home/luiz/Desktop/cs100/firstrepo/rshell/src
+
+luiz@luiz-MacBookPro$ls -a && echo hello && pwd
+.  ..  a.out  main.cc  main.cc~  test
+hello
+/home/luiz/Desktop/cs100/firstrepo/rshell/src
+
+luiz@luiz-MacBookPro$la -a && echo hello && pwd
+ERROR: CMD execution failed.
+: No such file or directory
+First Command Failed, cannot excute current command
+Cannot Execute Command, Previous CMD faliled.
+
+luiz@luiz-MacBookPro$ls -a && fdsf fsdf && pwd
+.  ..  a.out  main.cc  main.cc~  test
+ERROR: CMD execution failed.
+: No such file or directory
+Cannot Execute Command, Previous CMD faliled.
+
+luiz@luiz-MacBookPro$ls -a echo hello && pwd
+ls: cannot access echo: No such file or directory
+ls: cannot access hello: No such file or directory
+/home/luiz/Desktop/cs100/firstrepo/rshell/src
+
+luiz@luiz-MacBookPro$ls -a && pwd
+.  ..  a.out  main.cc  main.cc~  test
+/home/luiz/Desktop/cs100/firstrepo/rshell/src
+
+luiz@luiz-MacBookPro$la -a && pwd
+ERROR: CMD execution failed.
+: No such file or directory
+Cannot Execute Command, Previous CMD faliled.
+
+luiz@luiz-MacBookPro$ls -a&& echo hello
+.  ..  a.out  main.cc  main.cc~  test
+hello
+
+luiz@luiz-MacBookPro$ls -a &&echo hello
+.  ..  a.out  main.cc  main.cc~  test
+hello
+
+luiz@luiz-MacBookPro$ls -a &&echo hello && pwd
+.  ..  a.out  main.cc  main.cc~  test
+hello
+/home/luiz/Desktop/cs100/firstrepo/rshell/src
+
+luiz@luiz-MacBookPro$ls -a || echo hello
+.  ..  a.out  main.cc  main.cc~  test
+Cannot Execute Command, Previous CMD Succeeded.
+
+luiz@luiz-MacBookPro$ls -a || echo hello || pwd
+.  ..  a.out  main.cc  main.cc~  test
+First Command Succeeded, cannot excute current command
+Cannot Execute Command, Previous CMD Succeeded.
+
+luiz@luiz-MacBookPro$la -a || echo hello
+ERROR: CMD execution failed.
+: No such file or directory
+hello
+
+luiz@luiz-MacBookPro$la ||echo hello
+ERROR: CMD execution failed.
+: No such file or directory
+hello
+
+luiz@luiz-MacBookPro$la|| echo hello
+ERROR: CMD execution failed.
+: No such file or directory
+hello
+
+
+luiz@luiz-MacBookPro$ls -a #this a is a comment
+.  ..  a.out  blads.script  main.cc  main.cc~  test
+
+luiz@luiz-MacBookPro$ls -a#cdsfdfdsfsf
+.  ..  a.out  blads.script  main.cc  main.cc~  test
+
+luiz@luiz-MacBookPro$ls # fasldsadasd
+a.out  blads.script  main.cc  main.cc~	test
+
+luiz@luiz-MacBookPro$ls - -a ; echo hello #dgadafdfagsda
+.  ..  a.out  blads.script  main.cc  main.cc~  test
+hello
+
+luiz@luiz-MacBookPro$ls -a || echo hello #dasdasdasdasd
+.  ..  a.out  blads.script  main.cc  main.cc~  test
+Cannot Execute Command, Previous CMD Succeeded.
+
+luiz@luiz-MacBookPro$ls -a && echo hello #fsadsadasdasdsadasf
+.  ..  a.out  blads.script  main.cc  main.cc~  test
+hello
+
+luiz@luiz-MacBookPro$exit
+]0;luiz@luiz-MacBookPro: ~/Desktop/cs100/firstrepo/rshell/srcluiz@luiz-MacBookPro:~/Desktop/cs100/firstrepo/rshell/src$ exit
+
+Script done on Tue 21 Oct 2014 06:12:44 AM PDT
