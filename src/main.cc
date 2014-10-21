@@ -13,15 +13,15 @@ using namespace std;
 bool execute( vector<char *> command)
 {
 	bool good_exc = true;
-	char *argv[command.size()+ 1];
-	for(int i = 0; i < command.size(); ++i)	
+	int size = command.size() + 1;
+	char** argv = new char*[size];
+	for(unsigned i = 0; i < command.size(); ++i)	
 	{
 		argv[i] = command.at(i);	
-		cout << "Commands Parsed: " << argv[i] << endl;		
+
 	}								
 	argv[command.size()] = '\0';
 	int  pid = fork();
-	int status;
 	if(pid < 0)
 	{
 		perror("ERROR: forking child process failed\n");
@@ -29,34 +29,37 @@ bool execute( vector<char *> command)
 	}
 	else if (pid == 0)
 	{
-		if (execvp(*argv, argv) == -1)
+		if (execvp(argv[0], argv) == -1)
 		{
 			perror("ERROR: CMD execution failed.\n");
 			good_exc = false;
 		}
+		exit(1);
 	}
 	else
 	{
 		if(-1 == wait(0)) perror ("There was an error with wait().");
 	}
+	delete argv;
 	return good_exc;	
 }
 
 int main()
 {
 	string input;
+	char hostname[128];
+	char *lgn;
+	lgn = getlogin();
+	gethostname(hostname, 128);
 	bool no_exit = true;
 	while(no_exit)
 	{
-		char *name = getlogin();
-		char host[50];
-		gethostname(host,50);
-		cout << name <<"@"<< host <<"$";
+	
+		cout << lgn << "@"<< hostname << "$";
 		getline(cin, input);
 		if(input == "exit")
 		{
-			no_exit = false;
-			break;
+			exit(0);
 		}
 	if(input != "exit")
 	{		
@@ -72,16 +75,17 @@ int main()
 		bool found_ands = false;
 		bool found_par = false;
 		vector<char *>cmd_run; 
-		for(int i = 0; i < input_list.size();++i)
+		for(unsigned i = 0; i < input_list.size();++i)
 		{	
 			
 			string temp = input_list.at(i);
 			if(temp == ";")
 			{
+			
 				proper_exc = execute(cmd_run);
 				cmd_run.clear();
 			}
-			if(temp == "#")
+			else if(temp == "#")
 			{
 				proper_exc = execute(cmd_run);
 				cmd_run.clear();
