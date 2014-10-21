@@ -101,8 +101,10 @@ int main()
 				cmd_run.clear();
 			}
 			else if(temp == "#")
-			{
-				proper_exc = execute(cmd_run);
+			{	
+				if(no_exit && !found_ands && !found_par)proper_exc = execute(cmd_run);
+				if(found_ands && proper_exc)proper_exc = execute(cmd_run);
+				if(found_par && !proper_exc)proper_exc = execute(cmd_run);
 				cmd_run.clear();
 				break;
 			}
@@ -154,7 +156,9 @@ int main()
 					input_list.at(i) = const_cast<char *>(temp.substr(0, temp.find('#')).c_str());
 					cmd_run.pop_back();
 					cmd_run.push_back(input_list.at(i));
-					proper_exc = execute(cmd_run);
+					if(no_exit && !found_ands && !found_par)proper_exc = execute(cmd_run);
+					if(found_ands && proper_exc)proper_exc = execute(cmd_run);
+					if(found_par && !proper_exc)proper_exc = execute(cmd_run);
 					cmd_run.clear();
 					break;
 			
@@ -162,7 +166,10 @@ int main()
 				else
 				{
 					cmd_run.pop_back();
-					proper_exc = execute(cmd_run);
+					if(no_exit && !found_ands && !found_par)proper_exc = execute(cmd_run);
+					if(found_ands && proper_exc)proper_exc = execute(cmd_run);
+					if(found_par && !proper_exc)proper_exc = execute(cmd_run);
+	
 					cmd_run.clear();
 					break;
 		
