@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <pwd.h>
 #include <string.h>
 #include <vector>
 #include <string>
@@ -49,7 +50,9 @@ int main()
 	string input;
 	char hostname[128];
 	char *lgn;
-	lgn = getlogin();
+	struct passwd *p;
+	p = getpwuid(getuid());
+	lgn = p->pw_name;
 	gethostname(hostname, 128);
 	bool no_exit = true;
 	while(no_exit)
