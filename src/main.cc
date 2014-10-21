@@ -14,6 +14,8 @@ using namespace std;
 bool execute( vector<char *> command)
 {
 	bool good_exc = true;
+	int fd[2];
+	pipe(fd);
 	int size = command.size() + 1;
 	char** argv = new char*[size];
 	for(unsigned i = 0; i < command.size(); ++i)	
@@ -30,16 +32,26 @@ bool execute( vector<char *> command)
 	}
 	else if (pid == 0)
 	{
+		char val[1];
 		if (execvp(argv[0], argv) == -1)
 		{
 			perror("ERROR: CMD execution failed.\n");
-			good_exc = false;
+			val[0] = '0';
+		
 		}
+		else val[0] = '1';
+		close(fd[0]);
+		write(fd[1],val,1);	
 		exit(1);
 	}
 	else
 	{
 		if(-1 == wait(0)) perror ("There was an error with wait().");
+	char buff[2];
+	close(fd[1]);
+	int n = read(fd[0],buff,1);
+	buff[n] = 0;
+	if(buff[0] == '0')good_exc = false;
 	}
 	delete argv;
 	return good_exc;	
@@ -113,6 +125,7 @@ int main()
 				if(!found_par)
 				{
 					proper_exc = execute(cmd_run);
+				
 					cmd_run.clear();
 					found_par = true;
 				}
