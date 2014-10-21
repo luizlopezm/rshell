@@ -10,7 +10,6 @@
 
 
 using namespace std;
-
 bool execute( vector<char *> command)
 {
 	bool good_exc = true;
@@ -18,7 +17,7 @@ bool execute( vector<char *> command)
 	for(int i = 0; i < command.size(); ++i)	
 	{
 		argv[i] = command.at(i);	
-	
+		cout << "Commands Parsed: " << argv[i] << endl;		
 	}								
 	argv[command.size()] = '\0';
 	int  pid = fork();
@@ -30,7 +29,7 @@ bool execute( vector<char *> command)
 	}
 	else if (pid == 0)
 	{
-		if (execvp(*argv, argv) < 0)
+		if (execvp(*argv, argv) == -1)
 		{
 			perror("ERROR: CMD execution failed.\n");
 			good_exc = false;
@@ -59,7 +58,8 @@ int main()
 			no_exit = false;
 			break;
 		}
-		
+	if(input != "exit")
+	{		
 		char *token = strtok(const_cast<char*>(input.c_str()), " ");
 		vector<char *> input_list;
 		while(token != NULL)
@@ -69,6 +69,7 @@ int main()
 		}
 		
 		bool proper_exc = true;
+		bool found_ands = false;
 		vector<char *>cmd_run; 
 		for(int i = 0; i < input_list.size();++i)
 		{	
@@ -78,6 +79,20 @@ int main()
 			{
 				proper_exc = execute(cmd_run);
 				cmd_run.clear();
+			}
+			else if(temp == "&&")
+			{
+				if(proper_exc == true)
+				{
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					found_ands = true;
+				}
+				else
+				{
+					cout << "First Command Failed, cannot excute current command" << endl;
+					break;
+				}
 			}
 			else
 			{
@@ -94,6 +109,7 @@ int main()
 					cmd_run.push_back(input_list.at(i));
 					proper_exc = execute(cmd_run);
 					cmd_run.clear();
+					found_ands = false;
 			
 				}
 				else
@@ -101,14 +117,52 @@ int main()
 					cmd_run.pop_back();
 					proper_exc = execute(cmd_run);
 					cmd_run.clear();
+					found_ands = false;
 					input_list.at(i) = const_cast<char *>(temp.substr(temp.find(';')+1).c_str());
 					cmd_run.push_back(input_list.at(i));
 		
 				}
 			}
+			if(temp.find("&&") != string::npos && no_exit && temp != "&&" )
+			{
+				if(temp.find("&&") != 0)
+				{
+					input_list.at(i) = const_cast<char *>(temp.substr(0, temp.find("&&")).c_str());
+					cmd_run.pop_back();
+					found_ands = true;
+					cmd_run.push_back(input_list.at(i));
+					
+					if(proper_exc == true)proper_exc = execute(cmd_run);
+					else cout << "Cannot Execute Command, Previous CMD faliled." << endl;
+
+					cmd_run.clear();
+			
+				}
+				else
+				{
+					cmd_run.pop_back();
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					found_ands = true;
+					input_list.at(i) = const_cast<char *>(temp.substr(temp.find("&&")+2).c_str());
+					cmd_run.push_back(input_list.at(i));
+		
+				}
+			}
+
 		}
-		if(no_exit)proper_exc = execute(cmd_run);
+		if(no_exit && !found_ands)proper_exc = execute(cmd_run);
+		else if(no_exit && found_ands)
+		{
+			if(proper_exc)proper_exc = execute(cmd_run);
+			else
+			{
+				cout << "Cannot Execute Command, Previous CMD faliled." << endl;
+			}
+
+		}
 		cout << endl;
+	}
 	}
 	return 0;
 }
