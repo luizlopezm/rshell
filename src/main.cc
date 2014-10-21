@@ -70,6 +70,7 @@ int main()
 		
 		bool proper_exc = true;
 		bool found_ands = false;
+		bool found_par = false;
 		vector<char *>cmd_run; 
 		for(int i = 0; i < input_list.size();++i)
 		{	
@@ -92,6 +93,26 @@ int main()
 				{
 					cout << "First Command Failed, cannot excute current command" << endl;
 					break;
+				}
+			}
+       			else if(temp == "||")
+			{
+				if(!found_par)
+				{
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					found_par = true;
+				}
+				else if(found_par && !proper_exc)
+				{
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					found_par = true;
+				}
+
+				else
+				{
+					cout << "First Command Succeeded, cannot excute current command" << endl;
 				}
 			}
 			else
@@ -149,9 +170,40 @@ int main()
 		
 				}
 			}
+			if(temp.find("||") != string::npos && no_exit && temp != "||" )
+			{
+				if(temp.find("||") != 0)
+				{
+					input_list.at(i) = const_cast<char *>(temp.substr(0, temp.find("||")).c_str());
+					cmd_run.pop_back();
+				
+					cmd_run.push_back(input_list.at(i));
+					
+					if(proper_exc && !found_par)proper_exc = execute(cmd_run);
+					else if(!proper_exc && found_par)proper_exc = execute(cmd_run);
+					
+					else cout << "Cannot Execute Command, Previous CMD Succeeded." << endl;
+
+					cmd_run.clear();
+					found_par = true;
+			
+				}
+				else
+				{
+					cmd_run.pop_back();
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					found_par = true;
+					input_list.at(i) = const_cast<char *>(temp.substr(temp.find("||")+2).c_str());
+					cmd_run.push_back(input_list.at(i));
+		
+				}
+			}
+
+
 
 		}
-		if(no_exit && !found_ands)proper_exc = execute(cmd_run);
+		if(no_exit && !found_ands && !found_par)proper_exc = execute(cmd_run);
 		else if(no_exit && found_ands)
 		{
 			if(proper_exc)proper_exc = execute(cmd_run);
@@ -161,7 +213,17 @@ int main()
 			}
 
 		}
+		else if(no_exit && found_par)
+		{
+			if(!proper_exc)proper_exc = execute(cmd_run);
+			else
+			{
+				cout << "Cannot Execute Command, Previous CMD Succeeded." << endl;
+			}
+		}
 		cout << endl;
+		cmd_run.clear();
+		cin.clear();
 	}
 	}
 	return 0;
