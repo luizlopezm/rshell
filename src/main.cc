@@ -81,6 +81,12 @@ int main()
 				proper_exc = execute(cmd_run);
 				cmd_run.clear();
 			}
+			if(temp == "#")
+			{
+				proper_exc = execute(cmd_run);
+				cmd_run.clear();
+				break;
+			}
 			else if(temp == "&&")
 			{
 				if(proper_exc == true)
@@ -121,6 +127,28 @@ int main()
 				cmd_run.push_back(input_list.at(i));
 	
 			}
+			if(temp.find('#') != string::npos && no_exit && temp != "#" )
+			{
+				if(temp.find('#') != 0)
+				{
+					input_list.at(i) = const_cast<char *>(temp.substr(0, temp.find('#')).c_str());
+					cmd_run.pop_back();
+					cmd_run.push_back(input_list.at(i));
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					break;
+			
+				}
+				else
+				{
+					cmd_run.pop_back();
+					proper_exc = execute(cmd_run);
+					cmd_run.clear();
+					break;
+		
+				}
+			}
+			
 			if(temp.find(';') != string::npos && no_exit && temp != ";" )
 			{
 				if(temp.find(';') != 0)
