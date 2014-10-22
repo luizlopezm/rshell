@@ -17,7 +17,7 @@ All other know bugs and fixes can be sent to llope039@ucr.edu
 
 File List
 ---------
-,,,
+'''
 .:
 Makefile
 
@@ -28,16 +28,16 @@ README.md
 ./src
 
 ./test
-,,,
+'''
 
-,,,
+'''
 /src:
 
 main.cc
-,,,
+'''
 
-,,,
+'''
 ./test:
 
 exec.script
-,,,
+'''
