@@ -61,7 +61,7 @@ int stats(string file)
 	//	cerr << "Error(" << errno << ") opening " << file << endl; 
 	//	return errno; 
 	}
-	if (f_stats.st_mode & S_ISDIR) cout << "d";
+	if (S_ISDIR(f_stats.st_mode)) cout << "d";
 	else cout <<"-";
 	if (f_stats.st_mode & S_IRUSR) cout << "r"; 
 	else cout << "-"; 
