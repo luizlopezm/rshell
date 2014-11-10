@@ -57,11 +57,12 @@ int stats(string file)
 	
 	if(status < 0);
 	{
-		cout << "FAILED"<< status << endl;
+		cout << "FAILED"<< status + 1 << endl;
 	//	cerr << "Error(" << errno << ") opening " << file << endl; 
 	//	return errno; 
 	}
-	cout <<"-";
+	if (f_stats.st_mode & S_ISDIR) cout << "d";
+	else cout <<"-";
 	if (f_stats.st_mode & S_IRUSR) cout << "r"; 
 	else cout << "-"; 
 	if (f_stats.st_mode & S_IWUSR) cout << "w"; 
