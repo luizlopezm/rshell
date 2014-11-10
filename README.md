@@ -52,7 +52,7 @@ likely on a windows based PC.
 IN ORDER TO RUN PROGRAM RUN FOLLOWING COMMANDS IN TERMINAL:
 
 ```
-$git clone http://github.com/luizlopezm/rshell.git
+$git clone https://github.com/luizlopezm/rshell.git
 $cd rshell
 $git checkout hw0
 $make
