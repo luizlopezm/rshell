@@ -6,7 +6,9 @@
 #include <iostream>
 #include <string>
 #include <stack>
-#include <errno.h> 
+#include <errno.h>
+#include <pwd.h>
+#include <grp.h>
 #include <stdio.h> 
 #include <time.h>
 #include <vector>
@@ -50,16 +52,28 @@ bool string_case(const string &a,const string &b)
 	return lexicographical_compare( temp3.begin(),temp3.end(), temp4.begin(),temp4.end(), case_char() );
 }
 
-int stats(string file)
+int stats(string dir, string file)
 {
 	struct stat f_stats;
-	int status = stat(file.c_str(), & f_stats);
+	string direc = dir + "/" + file;
+	int status = stat(direc.c_str(), & f_stats);
 	
-	if(status < 0);
+	if(status < 0)
 	{
-		cout << "FAILED"<< status + 1 << endl;
-	//	cerr << "Error(" << errno << ") opening " << file << endl; 
-	//	return errno; 
+		cerr << "Error(" << errno << ") opening " << file << endl; 
+		return errno; 
+	}
+	struct passwd *pw;
+	if((pw = getpwuid(f_stats.st_uid)) == NULL )
+	{
+		cerr << "Error(" << errno << ") Finding User" << endl; 
+		return errno; 
+	}
+	struct group  *gr;
+	if((gr = getgrgid(f_stats.st_gid)) == NULL )
+	{
+		cerr << "Error(" << errno << ") Finding Group" << endl; 
+		return errno; 
 	}
 	if (S_ISDIR(f_stats.st_mode)) cout << "d";
 	else cout <<"-";
@@ -83,7 +97,8 @@ int stats(string file)
 	else cout << "-"; 
 	cout << " ";
 	cout << f_stats.st_nlink << " ";
-	cout.width(10);
+	cout << pw->pw_name << " " << gr->gr_name << " ";
+	cout.width(5);
 	cout << right << f_stats.st_size << " ";
 	struct tm *timeinfo; 
 	char buffer [80]; 
@@ -92,26 +107,48 @@ int stats(string file)
 	cout << buffer << " ";
 }
 
-void print_dirL(vector<string> a)
+int  print_dirL(string dir, vector<string> a)
 {
 	vector<string>dot_stripped;
 	sort(a.begin(),a.end(),string_case);
 	for(int i = 0; i < a.size(); ++i)
 	{
-		stats(a.at(i));
-		cout << a.at(i) << endl;
+		stats(dir, a.at(i));
+		struct stat f_stats;
+		string direc = dir + "/" + a.at(i);
+		int status = stat(direc.c_str(), & f_stats);
+	
+		if(status < 0)
+		{
+			cerr << "Error(" << errno << ") opening " << a.at(i) << endl; 
+			return errno; 
+		}
+		if (S_ISDIR(f_stats.st_mode)) cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
+		else if (S_IEXEC & f_stats.st_mode) cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
+		else cout << a.at(i) << endl;
 	}
-	return;
 }
 
-void print_dir(vector<string> a)
+int print_dir(string dir , vector<string> a)
 {
 	sort(a.begin(),a.end(),string_case);
 	for(int i = 0; i < a.size(); ++i)
 	{
-		cout << a.at(i) << endl;
+		struct stat f_stats;
+		string direc = dir + "/" + a.at(i);
+		int status = stat(direc.c_str(), & f_stats);
+	
+		if(status < 0)
+		{
+			cerr << "Error(" << errno << ") opening " << a.at(i) << endl; 
+			return errno; 
+		}
+		if (S_ISDIR(f_stats.st_mode)) cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m" << "/" << endl;
+		else if (S_IEXEC & f_stats.st_mode) cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m" << "*" << endl;
+		else cout << a.at(i) << endl;
+
 	}
-	return;
+
 }
 
 int list_all(const string &dir,int flag1, int flag2, int flag3)
@@ -136,8 +173,8 @@ int list_all(const string &dir,int flag1, int flag2, int flag3)
 		}
 	}
 	closedir(curr_dir);
-	if(flag2 == 1)print_dirL(all_files);
-	if(flag1 == 0 && flag2 == 0 && flag3 == 0)print_dir(all_files);
+	if(flag2 == 1)print_dirL(dir, all_files);
+	if(flag1 == 0 && flag2 == 0 && flag3 == 0)print_dir(dir ,all_files);
 	return 0;
 }
 
