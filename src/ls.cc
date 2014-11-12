@@ -105,6 +105,7 @@ int stats(string dir, string file)
 	timeinfo = localtime (&f_stats.st_mtime); 
 	strftime(buffer, 80, "%b %d %R", timeinfo); 
 	cout << buffer << " ";
+	return 0;
 }
 
 int  print_dirL(string dir, vector<string> a)
@@ -129,12 +130,12 @@ int  print_dirL(string dir, vector<string> a)
 		else cout << a.at(i) << endl;
 	}
 	cout << endl;
+	return 0;
 }
 
 int print_dir(string dir , vector<string> a)
 {
 	sort(a.begin(),a.end(),string_case);
-	int count = 0;
 	for(int i = 0; i < a.size(); ++i)
 	{
 		struct stat f_stats;
@@ -151,6 +152,7 @@ int print_dir(string dir , vector<string> a)
 		else cout << a.at(i) << endl;
 	}
 	cout << endl;
+	return 0;
 
 }
 
@@ -178,6 +180,7 @@ int list_all(const string &dir,int flag1, int flag2, int flag3)
 	closedir(curr_dir);
 	if(flag2 == 1)print_dirL(dir, all_files);
 	else print_dir(dir ,all_files);
+	return 0;
 }
 
 
@@ -234,6 +237,7 @@ int list_allR(const string &dir,int flag1, int flag2, int flag3)
 		}
 	}
 	closedir(curr_dir2);
+	return 0;
 }
 
 
