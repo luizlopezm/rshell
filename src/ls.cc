@@ -112,7 +112,7 @@ int stats(string dir, string file)
 int  print_dirL(string dir, vector<string> a)
 {
 	sort(a.begin(),a.end(),string_case);
-	for(int i = 0; i < a.size(); ++i)
+	for(unsigned i = 0; i < a.size(); ++i)
 	{
 		stats(dir, a.at(i));
 		struct stat f_stats;
@@ -126,18 +126,18 @@ int  print_dirL(string dir, vector<string> a)
 		}
 		if (S_ISDIR(f_stats.st_mode))
 		{
-			if(a.at(i).at(0) == '.' && a.at(i) != "." && a.at(i) != "..") cout << "\e[47m";
-		 	cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
+			if(a.at(i).at(0) == '.' && a.at(i) != "." && a.at(i) != "..") cout << "\033[47m";
+		 	cout << "\033[1m" << "\033[94m"<< a.at(i) << "\033[0m"<< "/" << endl;
 		}
 		else if (S_IEXEC & f_stats.st_mode)
 		{
- 			if(a.at(i).at(0) == '.') cout << "\e[47m";
-			cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
+ 			if(a.at(i).at(0) == '.') cout << "\033[47m";
+			cout << "\033[1m" << "\033[92m"<< a.at(i) << "\033[0m"<< "*" << endl;
 		}
 		else 
 		{
-			if(a.at(i).at(0) == '.') cout << "\e[47m";
-			cout << a.at(i) << "\e[0m" << endl;
+			if(a.at(i).at(0) == '.') cout << "\033[47m";
+			cout << a.at(i) << "\033[0m" << endl;
 		}
 	}
 	cout << endl;
@@ -149,12 +149,12 @@ int print_dir(string dir , vector<string> a)
 {
 	sort(a.begin(),a.end(),string_case);
 	int count = 0;
-	int max_size = 0;
-	for(int i = 0; i <a.size(); ++i)
+	unsigned max_size = 0;
+	for(unsigned i = 0; i <a.size(); ++i)
 	{
 	  if(a.at(i).length() > max_size)max_size = a.at(i).length();
 	}
-	for(int i = 0; i < a.size(); ++i)
+	for(unsigned i = 0; i < a.size(); ++i)
 	{
 		struct stat f_stats;
 		string direc = dir + "/" + a.at(i);
@@ -174,18 +174,18 @@ int print_dir(string dir , vector<string> a)
 
 		if (S_ISDIR(f_stats.st_mode))
 		{
-		 if(a.at(i).at(0) == '.' && a.at(i) != "." && a.at(i) != "..") cout << "\e[47m";
-		 cout << "\e[1m" << "\e[94m"<< setw(max_size + 2) << left << a.at(i) + "/"<< "\e[0m";
+		 if(a.at(i).at(0) == '.' && a.at(i) != "." && a.at(i) != "..") cout << "\033[47m";
+		 cout << "\033[1m" << "\033[94m"<< setw(max_size + 2) << left << a.at(i) + "/"<< "\033[0m";
 		}
 		else if (S_IEXEC & f_stats.st_mode)
 		{
-                 if(a.at(i).at(0) == '.') cout << "\e[47m";	 
-		 cout << "\e[1m" << "\e[92m"<< setw(max_size + 2) << left << a.at(i) + "*"<< "\e[0m";
+                 if(a.at(i).at(0) == '.') cout << "\033[47m";	 
+		 cout << "\033[1m" << "\033[92m"<< setw(max_size + 2) << left << a.at(i) + "*"<< "\033[0m";
 		}
 		else
 		{
-		 if(a.at(i).at(0) == '.') cout << "\e[47m";
-		 cout << setw(max_size + 2) << left << a.at(i) << "\e[0m";
+		 if(a.at(i).at(0) == '.') cout << "\033[47m";
+		 cout << setw(max_size + 2) << left << a.at(i) << "\033[0m";
 		}
 	}
 	return 0;
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
 		else dir_in.push_back(argv[i]);
 	}
 	if(dir_in.size() == 0)dir_in.push_back(".");
-	for(int i = 0; i < dir_in.size(); ++i)
+	for(unsigned i = 0; i < dir_in.size(); ++i)
 	{
 		if(flag3 == 1)
 		{
