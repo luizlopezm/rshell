@@ -14,7 +14,8 @@
 #include <vector>
 #include <algorithm>
 #include <unistd.h>
-
+#include <iomanip>
+#include <string.h>
 
 using namespace std;
 
@@ -123,19 +124,36 @@ int  print_dirL(string dir, vector<string> a)
 			cerr << "Error(" << errno << ") opening " << a.at(i) << endl; 
 			return errno; 
 		}
-		if (S_ISDIR(f_stats.st_mode)) cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
-		else if (S_IEXEC & f_stats.st_mode) cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
-		else if (S_ISDIR(f_stats.st_mode) && a.at(i).at(0) == '.') cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
-		else if (S_IEXEC & f_stats.st_mode && a.at(i).at(0) == '.') cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
-		else cout << a.at(i) << endl;
+		if (S_ISDIR(f_stats.st_mode))
+		{
+			if(a.at(i).at(0) == '.' && a.at(i) != "." && a.at(i) != "..") cout << "\e[47m";
+		 	cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
+		}
+		else if (S_IEXEC & f_stats.st_mode)
+		{
+ 			if(a.at(i).at(0) == '.') cout << "\e[47m";
+			cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
+		}
+		else 
+		{
+			if(a.at(i).at(0) == '.') cout << "\e[47m";
+			cout << a.at(i) << "\e[0m" << endl;
+		}
 	}
 	cout << endl;
 	return 0;
 }
 
+
 int print_dir(string dir , vector<string> a)
 {
 	sort(a.begin(),a.end(),string_case);
+	int count = 0;
+	int max_size = 0;
+	for(int i = 0; i <a.size(); ++i)
+	{
+	  if(a.at(i).length() > max_size)max_size = a.at(i).length();
+	}
 	for(int i = 0; i < a.size(); ++i)
 	{
 		struct stat f_stats;
@@ -147,11 +165,29 @@ int print_dir(string dir , vector<string> a)
 			cerr << "Error(" << errno << ") opening " << a.at(i) << endl; 
 			return errno; 
 		}
-		if (S_ISDIR(f_stats.st_mode)) cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m" << "/" << endl;
-		else if (S_IEXEC & f_stats.st_mode) cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m" << "*" << endl;
-		else cout << a.at(i) << endl;
+		if(count == 4)
+		{
+		count = 0;
+		cout << endl;
+		}
+		++count;
+
+		if (S_ISDIR(f_stats.st_mode))
+		{
+		 if(a.at(i).at(0) == '.' && a.at(i) != "." && a.at(i) != "..") cout << "\e[47m";
+		 cout << "\e[1m" << "\e[94m"<< setw(max_size + 2) << left << a.at(i) + "/"<< "\e[0m";
+		}
+		else if (S_IEXEC & f_stats.st_mode)
+		{
+                 if(a.at(i).at(0) == '.') cout << "\e[47m";	 
+		 cout << "\e[1m" << "\e[92m"<< setw(max_size + 2) << left << a.at(i) + "*"<< "\e[0m";
+		}
+		else
+		{
+		 if(a.at(i).at(0) == '.') cout << "\e[47m";
+		 cout << setw(max_size + 2) << left << a.at(i) << "\e[0m";
+		}
 	}
-	cout << endl;
 	return 0;
 
 }
@@ -231,6 +267,7 @@ int list_allR(const string &dir,int flag1, int flag2, int flag3)
 			 if(temp.compare(".") != 0  && temp.compare("..") !=  0)
 			{
 	 		 string reccur = dir +  "/" + file_name2;
+			 cout << endl;
 			 list_allR(reccur, flag1, flag2, flag3);
 			}
 			}	
@@ -336,25 +373,28 @@ int main(int argc, char *argv[])
 		{
 		  flag3 = 1;
 		  flag2 = 1;
-		  flag1 = 1;	
-		}	
+		  flag1 = 1;
+		}
 		else if(str15.compare(argv[i]) == 0)
 		{
 		  flag3 = 1;
 		  flag2 = 1;
-		  flag1 = 1;	
-		}	
+		  flag1 = 1;
+		}
 		else dir_in.push_back(argv[i]);
 	}
 	if(dir_in.size() == 0)dir_in.push_back(".");
 	for(int i = 0; i < dir_in.size(); ++i)
 	{
-	  if(flag3 == 1)
-	   {
-		list_allR(dir_in.at(i),flag1,flag2,flag3);
-	   }
-	   else list_all(dir_in.at(i),flag1,flag2,flag3);
-	  cout << endl;
-	}	
-	return 0;
+		if(flag3 == 1)
+		{
+		  list_allR(dir_in.at(i),flag1,flag2,flag3);
+		}
+		else list_all(dir_in.at(i),flag1,flag2,flag3);
+		cout << endl;
+	}
+return 0;
 }
+
+
+
