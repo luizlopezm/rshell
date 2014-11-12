@@ -109,7 +109,6 @@ int stats(string dir, string file)
 
 int  print_dirL(string dir, vector<string> a)
 {
-	vector<string>dot_stripped;
 	sort(a.begin(),a.end(),string_case);
 	for(int i = 0; i < a.size(); ++i)
 	{
@@ -125,13 +124,17 @@ int  print_dirL(string dir, vector<string> a)
 		}
 		if (S_ISDIR(f_stats.st_mode)) cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
 		else if (S_IEXEC & f_stats.st_mode) cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
+		else if (S_ISDIR(f_stats.st_mode) && a.at(i).at(0) == '.') cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m"<< "/" << endl;
+		else if (S_IEXEC & f_stats.st_mode && a.at(i).at(0) == '.') cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m"<< "*" << endl;
 		else cout << a.at(i) << endl;
 	}
+	cout << endl;
 }
 
 int print_dir(string dir , vector<string> a)
 {
 	sort(a.begin(),a.end(),string_case);
+	int count = 0;
 	for(int i = 0; i < a.size(); ++i)
 	{
 		struct stat f_stats;
@@ -146,8 +149,8 @@ int print_dir(string dir , vector<string> a)
 		if (S_ISDIR(f_stats.st_mode)) cout << "\e[1m" << "\e[94m"<< a.at(i) << "\e[0m" << "/" << endl;
 		else if (S_IEXEC & f_stats.st_mode) cout << "\e[1m" << "\e[92m"<< a.at(i) << "\e[0m" << "*" << endl;
 		else cout << a.at(i) << endl;
-
 	}
+	cout << endl;
 
 }
 
@@ -174,9 +177,68 @@ int list_all(const string &dir,int flag1, int flag2, int flag3)
 	}
 	closedir(curr_dir);
 	if(flag2 == 1)print_dirL(dir, all_files);
-	if(flag1 == 0 && flag2 == 0 && flag3 == 0)print_dir(dir ,all_files);
-	return 0;
+	else print_dir(dir ,all_files);
 }
+
+
+int list_allR(const string &dir,int flag1, int flag2, int flag3)
+{
+	vector<string>all_files;
+	cout << dir << ":" << endl;
+	DIR *curr_dir;
+	if (!(curr_dir = opendir(dir.c_str()))) 
+	{ 
+		cerr << "Error(" << errno << ") opening " << dir << endl; 
+		return errno; 
+	} 
+	
+	if(curr_dir)
+	{
+		struct dirent *tmp_dir;
+		while( (tmp_dir = readdir(curr_dir)) != NULL)
+		{
+			if (tmp_dir->d_name[0]=='.' && flag1 == 0) 
+			continue;
+			string file_name = tmp_dir->d_name;
+			all_files.push_back(file_name);				
+		}
+	}
+	if(flag2 == 1)print_dirL(dir, all_files);
+	else print_dir(dir ,all_files);
+	closedir(curr_dir);
+	DIR *curr_dir2;
+	if (!(curr_dir2 = opendir(dir.c_str()))) 
+	{ 
+		cerr << "Error(" << errno << ") opening " << dir << endl; 
+		return errno; 
+	} 
+	
+	if(curr_dir2)
+	{
+		struct dirent *tmp_dir2;
+		while( (tmp_dir2 = readdir(curr_dir2)) != NULL)
+		{
+			if (tmp_dir2->d_name[0]=='.' && flag1 == 0) 
+			continue;
+			string file_name2 = tmp_dir2->d_name;
+			string temp = tmp_dir2->d_name;
+			
+			if((tmp_dir2->d_type & DT_DIR))
+			{
+			 if(temp.compare(".") != 0  && temp.compare("..") !=  0)
+			{
+	 		 string reccur = dir +  "/" + file_name2;
+			 list_allR(reccur, flag1, flag2, flag3);
+			}
+			}	
+		}
+	}
+	closedir(curr_dir2);
+}
+
+
+
+
 
 
 int main(int argc, char *argv[])
@@ -188,6 +250,18 @@ int main(int argc, char *argv[])
 	string str2 = "-a";
 	string str3 = "-la";
 	string str4 = "-al";
+	string str5 = "-R";
+	string str6 = "-Ra";
+	string str7 = "-aR";
+	string str8 = "-Rl";
+	string str9 = "-lR";
+	string str10 = "-Ral";
+	string str11 = "-Rla";
+	string str12 = "-lRa";
+	string str13 = "-aRl";
+	string str14 = "-alR";
+	string str15 = "-laR";
+
 
 	vector<string>dir_in;
 	
@@ -195,7 +269,7 @@ int main(int argc, char *argv[])
 	{
 	
 		if(str1.compare(argv[i]) == 0 )flag2 = 1;
-		else if(str2.compare(argv[i]) == 0 )flag1 = 0;
+		else if(str2.compare(argv[i]) == 0 )flag1 = 1;
 		else if(str3.compare(argv[i]) == 0 )
 		{
 		  flag1 = 1;
@@ -206,11 +280,77 @@ int main(int argc, char *argv[])
 		  flag1 = 1;
 		  flag2 = 1;
 		}
+		else if(str5.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		}
+		else if(str6.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag1 = 1;
+		}
+		else if(str7.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag1 = 1;
+		}	
+		else if(str8.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		}
+		else if(str9.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		}
+		else if(str10.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		  flag1 = 1;	
+		}
+		else if(str11.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		  flag1 = 1;	
+		}
+		else if(str12.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		  flag1 = 1;	
+		}
+		else if(str13.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		  flag1 = 1;	
+		}	
+		else if(str14.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		  flag1 = 1;	
+		}	
+		else if(str15.compare(argv[i]) == 0)
+		{
+		  flag3 = 1;
+		  flag2 = 1;
+		  flag1 = 1;	
+		}	
 		else dir_in.push_back(argv[i]);
 	}
+	if(dir_in.size() == 0)dir_in.push_back(".");
 	for(int i = 0; i < dir_in.size(); ++i)
 	{
-	  list_all(dir_in.at(i),flag1,flag2,flag3);
+	  if(flag3 == 1)
+	   {
+		list_allR(dir_in.at(i),flag1,flag2,flag3);
+	   }
+	   else list_all(dir_in.at(i),flag1,flag2,flag3);
+	  cout << endl;
 	}	
 	return 0;
-}	
+}
